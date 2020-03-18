@@ -13,34 +13,58 @@ use Illuminate\Http\Request;
 |
 */
 
-$router->get('/', function (Request $request) use ($router) {
-	new App\Models\User();
-	// return response($request->cookie('token'))->cookie(cookie('token','aa'));
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+
+Auth::routes();
+
+Route::get('/', function (Request $request) {
 	$anime = App\Models\Anime::where('status','end')->get();
-	// dd($anime);
 	return $anime->toArray();
 });
 
 
-$router->group(['prefix'=>'auth','namespace'=>'Auth'],function() use($router){
-	$router->post('login', 'AuthController@login');
-	$router->post('logout', 'AuthController@logout');
-	$router->post('refresh', 'AuthController@refresh');
-	$router->post('register','RegisterController@register');
+//Route::group(['prefix'=>'auth','namespace'=>'Auth'],function(){
+//	Route::post('login', 'LoginController@login');
+//	Route::post('logout', 'AuthController@logout');
+//	Route::post('refresh', 'AuthController@refresh');
+//	Route::post('register','RegisterController@register');
+//});
+
+
+Route::get('/carousel/{name}','IndexController@carousel');
+Route::get('/user/{id}/info','UserController@show');
+Route::get('/animes/','AnimeController@index');
+Route::get('/animes/timeline','AnimeController@timeline');
+Route::get('/animes/recently-updated','AnimeController@recentlyUpdated');
+Route::get('/animes/search','AnimeController@search');
+
+Route::get('/animes/{id}/info','AnimeController@show');
+Route::get('/animes/{id}/episode','AnimeController@episode');
+Route::get('/animes/tags','TagController@tags');
+Route::get('/animes/tags/index','AnimeController@index');
+Route::get('/animes/episode/{id}/resource','EpisodeController@resource');
+
+Route::get('/animes/episode/{id}/comment','EpisodeController@comment');
+Route::post('/animes/episode/{id}/comment', 'CommentController@store');
+Route::get('/animes/episode/comment/{id}', 'CommentController@show');
+Route::delete('/animes/episode/comment/{id}', 'CommentController@destroy');
+
+
+Route::get('/animes/episode/danmaku/v3/','DanmakuController@index');
+
+
+//Route::options('/animes/episode/danmaku/v3/','DanmakuController@index');
+
+
+Route::middleware('auth')->group(function (){
+    Route::get('/home', 'HomeController@index')->name('home');
+    Route::get('/user/me','UserController@self');
+    Route::post('/user', 'UserController@update');
+    Route::post('/user/modifyAvatar', 'UserController@modifyAvatar');
+    Route::post('/user/modifyCover', 'UserController@modifyCover');
+    Route::post('/comment/create','CommentController@create');
+    Route::post('/comment/delete','CommentController@delete');
+    Route::post('/animes/episode/danmaku/v3/','DanmakuController@create');
 });
-
-$router->get('/user/me',['middleware'=>'auth:api','uses'=>'UserController@self']);
-$router->get('/user/{id}/info',['middleware'=>'auth:api','uses'=>'UserController@show']);
-$router->get('/animes/','AnimeController@index');
-$router->get('/animes/timeline','AnimeController@timeline');
-$router->get('/animes/recently-updated','AnimeController@recentlyUpdated');
-
-$router->get('/animes/{id}/info','AnimeController@show');
-$router->get('/animes/{id}/video','AnimeController@video');
-$router->get('/animes/tags','TagController@tags');
-$router->get('/animes/index','AnimeController@index');
-$router->get('/animes/video/{id}/resource','VideoController@resource');
-$router->get('/animes/video/{id}/comment','CommentController@show');
-$router->get('/animes/video/danmaku/','DanmakuController@index');
-$router->post('/comment/create','CommentController@create');
-$router->post('/comment/delete','CommentController@delete');

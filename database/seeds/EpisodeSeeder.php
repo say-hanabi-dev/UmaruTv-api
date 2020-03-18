@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class VideoSeeder extends Seeder
+class EpisodeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,11 +15,11 @@ class VideoSeeder extends Seeder
     	$faker = app(Faker\Generator::class);
 
         foreach($animes as $anime){
-            $videos = factory(App\Models\Video::class,12)->make()->each(function($video) use ($faker,$anime){
+            $videos = factory(App\Models\Episodes::class,5)->make()->each(function($video) use ($faker,$anime){
                 $video->anime_id = $anime;
             });
 
-            App\Models\Video::insert($videos->toArray());
+            App\Models\Episodes::insert($videos->toArray());
         }
     }
 }

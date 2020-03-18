@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Danmaku;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DanmakuController extends Controller
 {
@@ -19,7 +20,7 @@ class DanmakuController extends Controller
 
     public function index(Request $request)
     {
-        $danmaku =  Danmaku::where('video_id',$request->input('id'))->get();
+        $danmaku =  Danmaku::where('episode_id',$request->input('id'))->get();
         $result = [];
         foreach ($danmaku as $i) {
             $result[] = [
@@ -34,5 +35,14 @@ class DanmakuController extends Controller
             'code'=>0,
             'data'=>$result
         ];
+    }
+
+    public function create(Request $request)
+    {
+        $data = array_merge($request->toArray(), [
+            'user_id' =>Auth::id(),
+            'episode_id'=>$request->input('id'),
+        ]);
+        return Danmaku::create($data);
     }
 }
